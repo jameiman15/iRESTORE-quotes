@@ -478,6 +478,7 @@ function App(){
                   總計：<strong>{fmt(q.total)}</strong>　{(q.items||[]).length} 項
                   {q.pdf_url&&<a href={q.pdf_url} target="_blank" style={{marginLeft:12,color:'var(--blue)',fontSize:12}}>📎 查看PDF</a>}
                 </div>
+                {q.notes&&<div style={{fontSize:12.5,color:'var(--text3)',marginBottom:8,background:'var(--bg)',borderRadius:6,padding:'5px 10px',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>📄 {q.notes}</div>}
                 <div style={{display:'flex',gap:8,paddingTop:10,borderTop:'0.5px solid var(--border)',flexWrap:'wrap'}}>
                   <button onClick={()=>openEditQuote(q)} style={S.btn()}>✏️ 編輯</button>
                   {q.status!=='converted'&&<button onClick={()=>convertToOrder(q)} style={S.btn('primary')}>→ 轉訂購單</button>}
