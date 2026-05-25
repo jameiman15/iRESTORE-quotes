@@ -178,7 +178,7 @@ function App(){
   const filteredQuotes=useMemo(()=>{
     const s=qSearch.toLowerCase();
     return quotes
-      .filter(q=>(!s||q.client_name?.toLowerCase().includes(s)||q.contact?.toLowerCase().includes(s)||(q.taxid||'').includes(s))&&(!qFilter||q.status===qFilter))
+      .filter(q=>(!s||q.client_name?.toLowerCase().includes(s)||q.contact?.toLowerCase().includes(s)||(q.taxid||'').includes(s)||(q.notes||'').toLowerCase().includes(s))&&(!qFilter||q.status===qFilter))
       .sort((a,b)=>{
         const da=a.date||'';const db=b.date||'';
         return qSort==='oldest'?da.localeCompare(db):db.localeCompare(da);
