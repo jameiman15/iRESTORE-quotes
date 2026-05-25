@@ -241,7 +241,8 @@ function App(){
   async function handlePdfUpload(e,quoteId){
     const file=e.target.files[0];if(!file)return;
     setUploading(true);
-    const path=`${quoteId||'draft'}/${Date.now()}_${file.name}`;
+    const safeName=file.name.replace(/[^a-zA-Z0-9.\-_]/g,'_');
+    const path=`${quoteId||'draft'}/${Date.now()}_${safeName}`;
     const{data,error}=await sb.storage.from('quotes-pdf').upload(path,file,{upsert:true});
     if(error){notify('上傳失敗：'+error.message);setUploading(false);return;}
     const{data:{publicUrl}}=sb.storage.from('quotes-pdf').getPublicUrl(path);
