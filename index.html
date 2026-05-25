@@ -442,12 +442,21 @@ function App(){
             </div>
 
             {/* 批次上傳區 */}
-            <label style={{display:'block',border:'1.5px dashed var(--border2)',borderRadius:12,padding:'24px 20px',textAlign:'center',cursor:uploading?'wait':'pointer',marginBottom:18,color:'var(--text2)',fontSize:14,background:'#fff'}}>
-              <input type="file" accept=".pdf" multiple webkitdirectory style={{display:'none'}} onChange={handleBatchUpload} disabled={uploading}/>
-              <div style={{fontSize:28,marginBottom:8}}>{uploading?'⏳':'📁'}</div>
-              <strong style={{color:'var(--text)'}}>{batchProgress||'點擊選擇資料夾或多個 PDF'}</strong>
-              <div style={{marginTop:4,fontSize:12.5}}>支援整個資料夾批次上傳，自動從檔名辨識診所名稱</div>
-            </label>
+            <div style={{border:'1.5px dashed var(--border2)',borderRadius:12,padding:'20px',textAlign:'center',marginBottom:18,background:'#fff'}}>
+              <div style={{fontSize:26,marginBottom:8}}>{uploading?'⏳':'📤'}</div>
+              <div style={{fontWeight:500,color:'var(--text)',marginBottom:4}}>{batchProgress||'批次上傳報價單 PDF'}</div>
+              <div style={{fontSize:12.5,color:'var(--text2)',marginBottom:14}}>只有檔名含「報價單」的 PDF 才會匯入，自動辨識診所名稱與日期</div>
+              <div style={{display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap'}}>
+                <label style={{...S.btn('primary'),cursor:'pointer'}}>
+                  <input type="file" accept=".pdf" multiple style={{display:'none'}} onChange={handleBatchUpload} disabled={uploading}/>
+                  📄 選擇多個檔案
+                </label>
+                <label style={{...S.btn(),cursor:'pointer'}}>
+                  <input type="file" accept=".pdf" webkitdirectory style={{display:'none'}} onChange={handleBatchUpload} disabled={uploading}/>
+                  📁 選擇整個資料夾
+                </label>
+              </div>
+            </div>
 
             {filteredQuotes.length===0?(
               <div style={{padding:40,textAlign:'center',color:'var(--text3)'}}>尚無報價單</div>
