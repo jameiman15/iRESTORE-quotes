@@ -106,35 +106,40 @@ function printOrder(o){
   </tr>`).join('');
   const html=`<!DOCTYPE html><html lang="zh-TW"><head><meta charset="UTF-8"><title>產品訂購單</title>
 <style>
-@page{size:A4;margin:12mm 15mm}
+@page{size:A4 portrait;margin:8mm 10mm}
 *{box-sizing:border-box}
-body{font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;font-size:11px;color:#000;margin:0;padding:0}
-.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px}
-.hd-info{font-size:10px;color:#333;line-height:1.8}
-.logo{text-align:center;flex:1}
-.logo-en{font-size:24px;font-weight:900;font-family:Arial,sans-serif}
-.logo-corp{font-size:11px;letter-spacing:1px}
-.logo-zh{font-size:13px;font-weight:bold}
-h1{text-align:center;font-size:19px;font-weight:bold;margin:10px 0 12px;letter-spacing:4px}
-.ig{display:grid;grid-template-columns:1fr 1fr;margin-bottom:12px;font-size:11px;line-height:2}
+html,body{width:100%;height:100%;margin:0;padding:0}
+body{font-family:'Microsoft JhengHei','Noto Sans TC',sans-serif;font-size:10px;color:#000}
+.hd{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px}
+.hd-info{font-size:9px;color:#333;line-height:1.7;white-space:nowrap}
+.logo{text-align:center;flex:1;padding:0 8px}
+.logo-en{font-size:20px;font-weight:900;font-family:Arial,sans-serif;white-space:nowrap}
+.logo-corp{font-size:10px;letter-spacing:1px;white-space:nowrap}
+.logo-zh{font-size:11px;font-weight:bold;white-space:nowrap}
+h1{text-align:center;font-size:16px;font-weight:bold;margin:6px 0 8px;letter-spacing:4px}
+.ig{display:grid;grid-template-columns:1fr 1fr;margin-bottom:8px;font-size:10px;line-height:1.8}
 .ir{display:flex;gap:4px}
-.il{color:#333;min-width:72px;white-space:nowrap}
-table{width:100%;border-collapse:collapse;margin-bottom:8px}
+.il{color:#333;min-width:65px;white-space:nowrap}
+table{width:100%;border-collapse:collapse;margin-bottom:6px}
 .th{background:#000;color:#fff}
-.th th{border:1px solid #000;padding:5px 8px;text-align:center;font-size:11px;font-weight:normal}
-.ss{display:flex;justify-content:flex-end;margin-bottom:8px}
-.st{border-collapse:collapse;min-width:200px}
-.st td{border:1px solid #999;padding:4px 10px;font-size:11px}
+.th th{border:1px solid #000;padding:4px 6px;text-align:center;font-size:10px;font-weight:normal}
+.ss{display:flex;justify-content:flex-end;margin-bottom:6px}
+.st{border-collapse:collapse;min-width:180px}
+.st td{border:1px solid #999;padding:3px 8px;font-size:10px}
 .st .tr td{font-weight:bold}
-.nb{border:1px solid #000;padding:8px 10px;margin-bottom:8px;font-size:10.5px;line-height:1.7}
-.tb{border:1px solid #000;padding:8px 10px;margin-bottom:12px;font-size:10.5px;line-height:1.7}
-.sb{display:flex;justify-content:flex-end;margin-top:8px}
-.sx{border:1px solid #000;width:200px;height:60px;padding:4px 8px;font-size:11px;font-weight:bold}
-@media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.nb{border:1px solid #000;padding:6px 8px;margin-bottom:6px;font-size:9.5px;line-height:1.6}
+.tb{border:1px solid #000;padding:6px 8px;margin-bottom:8px;font-size:9.5px;line-height:1.6}
+.sb{display:flex;justify-content:flex-end;margin-top:6px}
+.sx{border:1px solid #000;width:180px;height:50px;padding:4px 8px;font-size:10px;font-weight:bold}
+@media print{
+  body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{height:auto}
+  @page{size:A4 portrait;margin:8mm 10mm}
+}
 </style></head><body>
 <div class="hd">
   <div class="hd-info">公司地址：　新北市新店區民權路108-3號7樓<br>聯 絡 人 ：　詹雲丞</div>
-  <div class="logo"><div class="logo-en">WellMike</div><div class="logo-corp">BioHealth Corporation</div><div class="logo-zh">威麥克健康生技股份有限公司</div></div>
+  <div class="logo"><div class="logo-en">WellMike</div><div class="logo-corp">BioHealth&nbsp;Corporation</div><div class="logo-zh" style="white-space:nowrap">威麥克健康生技股份有限公司</div></div>
   <div class="hd-info" style="text-align:right">聯絡電話：　(02) 6628 - 6966#802<br>傳　　真：　(02) 2218 - 1804</div>
 </div>
 <h1>產品訂購單</h1>
