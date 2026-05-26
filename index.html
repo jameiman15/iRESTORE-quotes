@@ -551,16 +551,18 @@ function App(){
             {prodTab==='products'&&(
               <div>
                 <div style={{display:'flex',justifyContent:'flex-end',gap:8,marginBottom:12}}>
-                  <button onClick={async()=>{
-                    const newP={id:'p'+Date.now(),name:'新產品',price:0,price_tax:0,sort_order:products.length};
-                    await sb.from('products').insert(newP);
-                    setProducts(ps=>[...ps,newP]);
+                  <button onClick={()=>{
+                    setProducts(ps=>[...ps,{id:'',name:'',price:0,price_tax:0,sort_order:ps.length,_isNew:true}]);
                   }} style={S.btn()}>＋ 新增</button>
                   <button onClick={async()=>{
+                    let saved=0;
                     for(const p of products){
+                      if(!p.id||!p.name)continue;
                       await sb.from('products').upsert({id:p.id,name:p.name,price:p.price||0,price_tax:p.price_tax||0,sort_order:p.sort_order||0});
+                      saved++;
                     }
-                    notify('產品資料已全部儲存 ✓');
+                    await loadAll();
+                    notify(`產品資料已儲存 ${saved} 筆 ✓`);
                   }} style={S.btn('primary')}>💾 全部儲存</button>
                 </div>
                 <div style={{overflowX:'auto'}}>
