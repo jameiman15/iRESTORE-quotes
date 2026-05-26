@@ -441,7 +441,7 @@ function App(){
 
   function applyCombo(c){
     const ni=[...qItems];
-    c.items.forEach(ci=>{const p=getProduct(ci.pid);const ex=ni.find(i=>i.pid===ci.pid);if(ex)ex.qty+=ci.qty;else ni.push({pid:ci.pid,name:p.name||ci.pid,price:p.price||0,qty:ci.qty});});
+    c.items.forEach(ci=>{const p=getProduct(ci.pid);const itemPrice=ci.price!=null?ci.price:(p.price||0);const ex=ni.find(i=>i.pid===ci.pid);if(ex)ex.qty+=ci.qty;else ni.push({pid:ci.pid,name:p.name||ci.pid,price:itemPrice,qty:ci.qty});});
     setQItems([...ni]);
   }
 
@@ -687,7 +687,7 @@ function App(){
             if(!val)return;
             if(val.startsWith('combo:')){
               const c=combos.find(x=>x.id===val.slice(6));
-              if(c){const ni=[...oItems];c.items.forEach(ci=>{const p=getProduct(ci.pid);const ex=ni.find(i=>i.pid===ci.pid);if(ex)ex.qty+=ci.qty;else ni.push({pid:p.id||ci.pid,name:p.name||ci.pid,price:p.price||0,qty:ci.qty,serialFrom:'',serialTo:''});});setOItems([...ni]);}
+              if(c){const ni=[...oItems];c.items.forEach(ci=>{const p=getProduct(ci.pid);const itemPrice=ci.price!=null?ci.price:(p.price||0);const ex=ni.find(i=>i.pid===ci.pid);if(ex)ex.qty+=ci.qty;else ni.push({pid:p.id||ci.pid,name:p.name||ci.pid,price:itemPrice,qty:ci.qty,serialFrom:'',serialTo:''});});setOItems([...ni]);}
             }else{
               const p=products.find(x=>x.id===val);
               if(p){const ni=[...oItems];const ex=ni.find(i=>i.pid===p.id);if(ex)ex.qty+=1;else ni.push({pid:p.id,name:p.name,price:p.price||0,qty:1,serialFrom:'',serialTo:''});setOItems([...ni]);}
