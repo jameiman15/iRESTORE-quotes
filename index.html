@@ -253,7 +253,8 @@ function App(){
   }
 
   function getProduct(pid){return products.find(p=>p.id===pid)||{};}
-  function getComboTotal(c){return c.items.reduce((s,i)=>s+(getProduct(i.pid).price||0)*i.qty,0);}
+  function getComboTotal(c){return c.items.reduce((s,i)=>s+(i.price!=null?i.price:(getProduct(i.pid).price||0))*i.qty,0);}
+  function getComboTotalTax(c){return c.items.reduce((s,i)=>s+(i.price_tax!=null?i.price_tax:Math.round((i.price!=null?i.price:(getProduct(i.pid).price||0))*1.05))*i.qty,0);}
 
   function openNewCombo(){
     setEditingCombo(null);
@@ -603,7 +604,10 @@ function App(){
                     <div key={c.id} style={{background:'#fff',border:'0.5px solid var(--border)',borderRadius:12,padding:18}}>
                       <div style={{fontWeight:500,fontSize:14.5,marginBottom:8}}>📦 {c.name}</div>
                       <div style={{fontSize:12.5,color:'var(--text2)',marginBottom:12,lineHeight:1.8}}>{c.items.map((it,idx)=><div key={idx}>{getProduct(it.pid).name||it.pid} ×{it.qty}</div>)}</div>
-                      <div style={{fontSize:17,fontWeight:500,color:'var(--blue)',marginBottom:12}}>{fmt(getComboTotal(c))} <span style={{fontSize:11,fontWeight:400,color:'var(--text3)'}}>未稅</span></div>
+                      <div style={{marginBottom:12}}>
+                        <div style={{fontSize:17,fontWeight:500,color:'var(--blue)'}}>{fmt(getComboTotal(c))} <span style={{fontSize:11,fontWeight:400,color:'var(--text3)'}}>未稅</span></div>
+                        <div style={{fontSize:13,color:'var(--text2)',marginTop:2}}>{fmt(getComboTotalTax(c))} <span style={{fontSize:11}}>含稅</span></div>
+                      </div>
                       <div style={{display:'flex',gap:8}}>
                         <button onClick={()=>openEditCombo(c)} style={{...S.btn(),padding:'5px 12px',fontSize:12}}>✏️ 編輯</button>
                         <button onClick={async()=>{await sb.from('combos').delete().eq('id',c.id);setCombos(cs=>cs.filter(x=>x.id!==c.id));}} style={{...S.btn('danger'),padding:'5px 12px',fontSize:12}}>🗑</button>
@@ -630,7 +634,8 @@ function App(){
             <div key={c.id} onClick={()=>applyCombo(c)} style={{background:'var(--bg)',border:'0.5px solid var(--border2)',borderRadius:10,padding:14,cursor:'pointer'}}>
               <div style={{fontWeight:500,fontSize:13.5,marginBottom:6}}>📦 {c.name}</div>
               <div style={{fontSize:12,color:'var(--text2)',marginBottom:8,lineHeight:1.7}}>{c.items.map((it,idx)=><div key={idx}>{getProduct(it.pid).name||it.pid} ×{it.qty}</div>)}</div>
-              <div style={{fontSize:15,fontWeight:500,color:'var(--blue)'}}>{fmt(getComboTotal(c))}</div>
+              <div style={{fontSize:15,fontWeight:500,color:'var(--blue)'}}>{fmt(getComboTotal(c))} <span style={{fontSize:11,fontWeight:400,color:'var(--text3)'}}>未稅</span></div>
+              <div style={{fontSize:12,color:'var(--text2)'}}>{fmt(getComboTotalTax(c))} 含稅</div>
             </div>
           ))}
         </div>
@@ -690,7 +695,7 @@ function App(){
             e.target.value='';
           }} style={{...S.input,flex:1,minWidth:180}} defaultValue="">
             <option value="">— 選擇單品或組合加入 —</option>
-            <optgroup label="── 銷售組合 ──">{combos.map(c=><option key={c.id} value={`combo:${c.id}`}>📦 {c.name}（{fmt(getComboTotal(c))}）</option>)}</optgroup>
+            <optgroup label="── 銷售組合 ──">{combos.map(c=><option key={c.id} value={`combo:${c.id}`}>📦 {c.name}（未稅{fmt(getComboTotal(c))} / 含稅{fmt(getComboTotalTax(c))}）</option>)}</optgroup>
             <optgroup label="── 單品 ──">{products.map(p=><option key={p.id} value={p.id}>{p.name}（{fmt(p.price)}）</option>)}</optgroup>
           </select>
           <button onClick={()=>setOItems(its=>[...its,{pid:'',name:'',price:0,qty:1,serialFrom:'',serialTo:''}])} style={{...S.btn(),padding:'8px 12px',fontSize:13,whiteSpace:'nowrap'}}>＋ 空白行</button>
