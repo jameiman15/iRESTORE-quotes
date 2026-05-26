@@ -32,11 +32,11 @@ const SUPABASE_KEY='sb_publishable__DxrAPVTE-ywf9HvuMLkNQ_syQxsxaK';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
 const DEFAULT_PRODUCTS=[
-  {id:'ID-510',name:'雷射生髮帽旗艦版',price:36190,msrp:59800},
-  {id:'ID-510B',name:'行動供電器(旗艦型)',price:1905,msrp:2999},
-  {id:'ID-500',name:'雷射生髮帽專業型',price:28000,msrp:45000},
-  {id:'ID-50004',name:'氣墊按摩梳',price:0,msrp:0},
-  {id:'ID-53034',name:'愛麗朵爾白色紙袋',price:0,msrp:0},
+  {id:'ID-510',name:'雷射生髮帽旗艦版',price:36190,price_tax:38000},
+  {id:'ID-510B',name:'行動供電器(旗艦型)',price:1905,price_tax:2000},
+  {id:'ID-500',name:'雷射生髮帽專業型',price:28000,price_tax:29400},
+  {id:'ID-50004',name:'氣墊按摩梳',price:0,price_tax:0},
+  {id:'ID-53034',name:'愛麗朵爾白色紙袋',price:0,price_tax:0},
 ];
 const DEFAULT_COMBOS=[
   {id:'c1',name:'旗艦型套組',items:[{pid:'ID-510',qty:1},{pid:'ID-510B',qty:1},{pid:'ID-50004',qty:1},{pid:'ID-53034',qty:1}]},
@@ -554,17 +554,16 @@ function App(){
             </div>
             {prodTab==='products'&&(
               <div>
-                <div style={{display:'flex',justifyContent:'flex-end',marginBottom:12}}><button onClick={()=>setProducts(ps=>[...ps,{id:'',name:'',price:0,msrp:0}])} style={S.btn()}>＋ 新增</button></div>
+                <div style={{display:'flex',justifyContent:'flex-end',marginBottom:12}}><button onClick={()=>setProducts(ps=>[...ps,{id:'',name:'',price:0,price_tax:0}])} style={S.btn()}>＋ 新增</button></div>
                 <div style={{overflowX:'auto'}}>
                 <table style={{width:'100%',borderCollapse:'collapse',fontSize:13.5}}>
-                  <thead><tr>{['品號','品名','建議售價','進貨價(未稅)',''].map(h=><th key={h} style={{textAlign:'left',padding:'8px 10px',fontSize:12,color:'var(--text2)',borderBottom:'0.5px solid var(--border2)',background:'var(--bg)',whiteSpace:'nowrap'}}>{h}</th>)}</tr></thead>
+                  <thead><tr>{['品號','品名','進貨價(未稅)','進貨價(含稅)',''].map(h=><th key={h} style={{textAlign:'left',padding:'8px 10px',fontSize:12,color:'var(--text2)',borderBottom:'0.5px solid var(--border2)',background:'var(--bg)',whiteSpace:'nowrap'}}>{h}</th>)}</tr></thead>
                   <tbody>{products.map((p,i)=>(
                     <tr key={i}>
-                      {['id','name','msrp','price'].map(f=>(
-                        <td key={f} style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}>
-                          <input value={p[f]} type={f==='msrp'||f==='price'?'number':'text'} onChange={e=>setProducts(ps=>ps.map((x,j)=>j===i?{...x,[f]:f==='msrp'||f==='price'?+e.target.value:e.target.value}:x))} style={{...S.input,padding:'6px 8px',textAlign:f==='msrp'||f==='price'?'right':'left'}}/>
-                        </td>
-                      ))}
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input value={p.id} onChange={e=>setProducts(ps=>ps.map((x,j)=>j===i?{...x,id:e.target.value}:x))} style={{...S.input,padding:'6px 8px'}}/></td>
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input value={p.name} onChange={e=>setProducts(ps=>ps.map((x,j)=>j===i?{...x,name:e.target.value}:x))} style={{...S.input,padding:'6px 8px'}}/></td>
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input type="number" value={p.price} onChange={e=>{const v=+e.target.value;setProducts(ps=>ps.map((x,j)=>j===i?{...x,price:v,price_tax:Math.round(v*1.05)}:x));}} style={{...S.input,padding:'6px 8px',textAlign:'right'}}/></td>
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input type="number" value={p.price_tax||0} onChange={e=>{const v=+e.target.value;setProducts(ps=>ps.map((x,j)=>j===i?{...x,price_tax:v,price:Math.round(v/1.05)}:x));}} style={{...S.input,padding:'6px 8px',textAlign:'right'}}/></td>
                       <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><button onClick={()=>setProducts(ps=>ps.filter((_,j)=>j!==i))} style={S.btn('danger')}>🗑</button></td>
                     </tr>
                   ))}</tbody>
