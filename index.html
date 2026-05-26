@@ -31,18 +31,6 @@ const SUPABASE_URL='https://hpcrdguwwbrozqxbqogs.supabase.co';
 const SUPABASE_KEY='sb_publishable__DxrAPVTE-ywf9HvuMLkNQ_syQxsxaK';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 
-const DEFAULT_PRODUCTS=[
-  {id:'ID-510',name:'雷射生髮帽旗艦版',price:36190,price_tax:38000},
-  {id:'ID-510B',name:'行動供電器(旗艦型)',price:1905,price_tax:2000},
-  {id:'ID-500',name:'雷射生髮帽專業型',price:28000,price_tax:29400},
-  {id:'ID-50004',name:'氣墊按摩梳',price:0,price_tax:0},
-  {id:'ID-53034',name:'愛麗朵爾白色紙袋',price:0,price_tax:0},
-];
-const DEFAULT_COMBOS=[
-  {id:'c1',name:'旗艦型套組',items:[{pid:'ID-510',qty:1},{pid:'ID-510B',qty:1},{pid:'ID-50004',qty:1},{pid:'ID-53034',qty:1}]},
-  {id:'c2',name:'專業型套組 x2',items:[{pid:'ID-500',qty:2},{pid:'ID-50004',qty:1}]},
-];
-
 function genId(){return 'id_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);}
 
 const S={
@@ -203,8 +191,8 @@ ${o.notes?o.notes:''}
 
 function App(){
   const[page,setPage]=useState('quotes');
-  const[products,setProducts]=useState(DEFAULT_PRODUCTS);
-  const[combos,setCombos]=useState(DEFAULT_COMBOS);
+  const[products,setProducts]=useState([]);
+  const[combos,setCombos]=useState([]);
   const[comboModal,setComboModal]=useState(false);
   const[editingCombo,setEditingCombo]=useState(null);
   const[comboForm,setComboForm]=useState({name:'',items:[]});
@@ -238,12 +226,16 @@ function App(){
   async function loadAll(){
     setLoading(true);
     try{
-      const[qRes,oRes]=await Promise.all([
+      const[qRes,oRes,pRes,cRes]=await Promise.all([
         sb.from('quotes').select('*').order('created_at',{ascending:false}),
         sb.from('orders').select('*').order('created_at',{ascending:false}),
+        sb.from('products').select('*').order('sort_order',{ascending:true}),
+        sb.from('combos').select('*').order('created_at',{ascending:true}),
       ]);
       if(qRes.data)setQuotes(qRes.data);
       if(oRes.data)setOrders(oRes.data);
+      if(pRes.data)setProducts(pRes.data);
+      if(cRes.data)setCombos(cRes.data);
     }catch(e){notify('載入失敗');}
     setLoading(false);
   }
@@ -261,14 +253,18 @@ function App(){
     setComboForm({name:c.name,items:c.items.map(i=>({...i}))});
     setComboModal(true);
   }
-  function saveCombo(){
+  async function saveCombo(){
     if(!comboForm.name){notify('請填寫組合名稱');return;}
     if(editingCombo){
+      await sb.from('combos').update({name:comboForm.name,items:comboForm.items}).eq('id',editingCombo.id);
       setCombos(cs=>cs.map(c=>c.id===editingCombo.id?{...c,...comboForm}:c));
     }else{
-      setCombos(cs=>[...cs,{id:genId(),...comboForm}]);
+      const newC={id:genId(),name:comboForm.name,items:comboForm.items};
+      await sb.from('combos').insert(newC);
+      setCombos(cs=>[...cs,newC]);
     }
     setComboModal(false);
+    notify('組合已儲存 ✓');
   }
   function calcTotals(items){const sub=items.reduce((s,i)=>s+(i.price||0)*(i.qty||1),0);return{subtotal:sub,tax:Math.round(sub*0.05),total:sub+Math.round(sub*0.05)};}
 
@@ -560,11 +556,11 @@ function App(){
                   <thead><tr>{['品號','品名','進貨價(未稅)','進貨價(含稅)',''].map(h=><th key={h} style={{textAlign:'left',padding:'8px 10px',fontSize:12,color:'var(--text2)',borderBottom:'0.5px solid var(--border2)',background:'var(--bg)',whiteSpace:'nowrap'}}>{h}</th>)}</tr></thead>
                   <tbody>{products.map((p,i)=>(
                     <tr key={i}>
-                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input value={p.id} onChange={e=>setProducts(ps=>ps.map((x,j)=>j===i?{...x,id:e.target.value}:x))} style={{...S.input,padding:'6px 8px'}}/></td>
-                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input value={p.name} onChange={e=>setProducts(ps=>ps.map((x,j)=>j===i?{...x,name:e.target.value}:x))} style={{...S.input,padding:'6px 8px'}}/></td>
-                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input type="number" value={p.price} onChange={e=>{const v=+e.target.value;setProducts(ps=>ps.map((x,j)=>j===i?{...x,price:v,price_tax:Math.round(v*1.05)}:x));}} style={{...S.input,padding:'6px 8px',textAlign:'right'}}/></td>
-                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input type="number" value={p.price_tax||0} onChange={e=>{const v=+e.target.value;setProducts(ps=>ps.map((x,j)=>j===i?{...x,price_tax:v,price:Math.round(v/1.05)}:x));}} style={{...S.input,padding:'6px 8px',textAlign:'right'}}/></td>
-                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><button onClick={()=>setProducts(ps=>ps.filter((_,j)=>j!==i))} style={S.btn('danger')}>🗑</button></td>
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input value={p.id} onChange={e=>setProducts(ps=>ps.map((x,j)=>j===i?{...x,id:e.target.value}:x))} onBlur={e=>sb.from('products').update({id:e.target.value}).eq('id',p.id)} style={{...S.input,padding:'6px 8px'}}/></td>
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input value={p.name} onChange={e=>setProducts(ps=>ps.map((x,j)=>j===i?{...x,name:e.target.value}:x))} onBlur={e=>sb.from('products').update({name:e.target.value}).eq('id',p.id)} style={{...S.input,padding:'6px 8px'}}/></td>
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input type="number" value={p.price} onChange={e=>{const v=+e.target.value;setProducts(ps=>ps.map((x,j)=>j===i?{...x,price:v,price_tax:Math.round(v*1.05)}:x));}} onBlur={e=>{const v=+e.target.value;sb.from('products').update({price:v,price_tax:Math.round(v*1.05)}).eq('id',p.id);}} style={{...S.input,padding:'6px 8px',textAlign:'right'}}/></td>
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><input type="number" value={p.price_tax||0} onChange={e=>{const v=+e.target.value;setProducts(ps=>ps.map((x,j)=>j===i?{...x,price_tax:v,price:Math.round(v/1.05)}:x));}} onBlur={e=>{const v=+e.target.value;sb.from('products').update({price_tax:v,price:Math.round(v/1.05)}).eq('id',p.id);}} style={{...S.input,padding:'6px 8px',textAlign:'right'}}/></td>
+                      <td style={{padding:'5px 6px',borderBottom:'0.5px solid var(--border)'}}><button onClick={async()=>{await sb.from('products').delete().eq('id',p.id);setProducts(ps=>ps.filter((_,j)=>j!==i));}} style={S.btn('danger')}>🗑</button></td>
                     </tr>
                   ))}</tbody>
                 </table>
@@ -584,7 +580,7 @@ function App(){
                       <div style={{fontSize:17,fontWeight:500,color:'var(--blue)',marginBottom:12}}>{fmt(getComboTotal(c))} <span style={{fontSize:11,fontWeight:400,color:'var(--text3)'}}>未稅</span></div>
                       <div style={{display:'flex',gap:8}}>
                         <button onClick={()=>openEditCombo(c)} style={{...S.btn(),padding:'5px 12px',fontSize:12}}>✏️ 編輯</button>
-                        <button onClick={()=>setCombos(cs=>cs.filter(x=>x.id!==c.id))} style={{...S.btn('danger'),padding:'5px 12px',fontSize:12}}>🗑</button>
+                        <button onClick={async()=>{await sb.from('combos').delete().eq('id',c.id);setCombos(cs=>cs.filter(x=>x.id!==c.id));}} style={{...S.btn('danger'),padding:'5px 12px',fontSize:12}}>🗑</button>
                       </div>
                     </div>
                   ))}
