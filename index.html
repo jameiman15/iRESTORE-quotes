@@ -65,7 +65,7 @@ function SummaryBox({items}){
 function Modal({open,onClose,title,children}){
   if(!open)return null;
   return(
-    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.45)',zIndex:200,display:'flex',alignItems:'flex-start',justifyContent:'center',overflowY:'auto',padding:'20px 12px'}} onClick={e=>e.target===e.currentTarget&&onClose()}>
+    <div style={{position:'fixed',inset:0,background:'rgba(0,0,0,0.45)',zIndex:200,display:'flex',alignItems:'flex-start',justifyContent:'center',overflowY:'auto',padding:'20px 12px'}}>
       <div style={{background:'#fff',borderRadius:14,border:'0.5px solid var(--border)',width:'100%',maxWidth:680,padding:24,marginTop:20}}>
         <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
           <div style={{fontSize:17,fontWeight:500}}>{title}</div>
