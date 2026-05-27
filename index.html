@@ -400,12 +400,41 @@ function App(){
     notify('已刪除');
   }
 
-  function convertToOrder(q){
+  async function convertToOrder(q){
     setEditingO(null);
     setOForm({client_name:q.client_name||'',contact:q.contact||'',phone:q.phone||'',email:q.email||'',address:q.address||'',title:q.title||q.client_name||'',taxid:q.taxid||'',date:today(),payment:'匯款',transfer_code:'',quote_id:q.id});
     setOItems((q.items||[]).map(i=>({...i,serialFrom:'',serialTo:''})));
     updateQuoteStatus(q.id,'converted');
     setOrderModal(true);
+    // 若有 PDF，自動 AI 辨識填入欄位
+    if(q.pdf_url){
+      setAiLoading(true);
+      try{
+        const[infoRes,itemsRes]=await Promise.all([
+          fetch('/api/parse-pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pdfUrl:q.pdf_url,mode:'info'})}),
+          fetch('/api/parse-pdf',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pdfUrl:q.pdf_url,mode:'items'})}),
+        ]);
+        const[infoD,itemsD]=await Promise.all([infoRes.json(),itemsRes.json()]);
+        if(infoD.result){
+          const info=infoD.result;
+          setOForm(f=>({
+            ...f,
+            client_name:info.client_name||f.client_name,
+            contact:info.contact||f.contact,
+            phone:info.phone||f.phone,
+            email:info.email||f.email,
+            address:info.address||f.address,
+            title:info.title||f.title,
+            taxid:info.taxid||f.taxid,
+          }));
+        }
+        if(itemsD.result&&itemsD.result.length>0){
+          setOItems(itemsD.result.map(i=>({...i,serialFrom:'',serialTo:''})));
+        }
+        notify('AI 辨識完成，請確認後儲存 ✓');
+      }catch(e){notify('AI 辨識失敗，資料已由報價單帶入');}
+      setAiLoading(false);
+    }
   }
 
   function openEditOrder(o){
@@ -667,7 +696,7 @@ function App(){
         </div>
       </Modal>
 
-      <Modal open={orderModal} onClose={()=>setOrderModal(false)} title={editingO?'編輯訂購單':'產品訂購單'}>
+      <Modal open={orderModal} onClose={()=>setOrderModal(false)} title={editingO?'編輯訂購單':(aiLoading?'產品訂購單　⏳ AI 辨識中...':'產品訂購單')}>
         <SecTitle>收貨資訊</SecTitle>
         <Row><Field label="收貨人"><input style={S.input} value={oForm.client_name||''} onChange={e=>setOForm(f=>({...f,client_name:e.target.value}))}/></Field><Field label="聯絡人" half><input style={S.input} value={oForm.contact||''} onChange={e=>setOForm(f=>({...f,contact:e.target.value}))}/></Field></Row>
         <Row><Field label="電話" half><input style={S.input} value={oForm.phone||''} onChange={e=>setOForm(f=>({...f,phone:e.target.value}))}/></Field><Field label="E-Mail" half><input style={S.input} value={oForm.email||''} onChange={e=>setOForm(f=>({...f,email:e.target.value}))}/></Field></Row>
