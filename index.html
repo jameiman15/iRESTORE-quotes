@@ -124,7 +124,7 @@ body{
 .logo-zh{font-size:10px;font-weight:bold;white-space:nowrap;display:block;letter-spacing:0}
 h1{text-align:center;font-size:20px;font-weight:bold;margin:5px 0 7px;letter-spacing:4px}
 .ig{display:grid;grid-template-columns:1fr 1fr;margin-bottom:7px;font-size:9px;line-height:1.7}
-.ir{display:flex;gap:3px}
+.ir{display:grid;grid-template-columns:62px 1fr;gap:2px;align-items:baseline}
 .il{color:#333;min-width:58px;white-space:nowrap;font-size:9px}
 table{width:100%;border-collapse:collapse;margin-bottom:5px;table-layout:fixed}
 .th{background:#000;color:#fff}
@@ -158,12 +158,12 @@ tbody td{border:1px solid #999;padding:3px 5px;font-size:9px;overflow:hidden;tex
     <div class="ir"><span class="il">電　　話：</span><span>${o.phone||''}</span></div>
     <div class="ir"><span class="il">E-Mail：</span><span>${o.email||''}</span></div>
   </div>
-  <div style="margin-left:auto;width:75mm">
-    <div class="ir"><span class="il" style="text-align:right">出貨單號：</span><span></span></div>
-    <div class="ir"><span class="il" style="text-align:right">日　　期：</span><span>${o.date||''}</span></div>
-    <div class="ir"><span class="il" style="text-align:right">傳　　真：</span><span></span></div>
-    <div class="ir"><span class="il" style="text-align:right">抬　　頭：</span><span>${o.title||'不需要'}</span></div>
-    <div class="ir"><span class="il" style="text-align:right">統一編號：</span><span>${o.taxid||'不需要'}</span></div>
+  <div style="margin-left:auto;width:78mm">
+    <div class="ir"><span class="il">出貨單號：</span><span></span></div>
+    <div class="ir"><span class="il">日　　期：</span><span>${o.date||''}</span></div>
+    <div class="ir"><span class="il">傳　　真：</span><span></span></div>
+    <div class="ir"><span class="il">抬　　頭：</span><span>${o.title||'不需要'}</span></div>
+    <div class="ir"><span class="il">統一編號：</span><span>${o.taxid||'不需要'}</span></div>
   </div>
 </div>
 <table>
